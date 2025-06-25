@@ -1,0 +1,19 @@
+# requirements.txt for FakeFaceGen project
+
+# 科学计算与数据处理
+numpy
+
+# 图像处理库
+opencv-python
+scikit-image
+Pillow
+
+# 数据可视化
+matplotlib
+
+# 进度条工具
+tqdm
+
+# PyTorch 核心与视觉库 (根据你的说明，可能已安装)
+torch
+torchvision
