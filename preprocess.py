@@ -8,13 +8,13 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 """多线程将图片缩放后再裁切到64*64分辨率"""
 # 裁切图片宽度
-w = 64
+w = 128
 # 裁切图片高度
-h = 64
+h = 128
 # 裁切点横坐标(以图片左上角为原点)
 x = 0
 # 裁切点纵坐标
-y = 20
+y = (218 - 128) // 2
 
 
 def cutArray(l, num):
@@ -62,7 +62,7 @@ class thread(threading.Thread):
 
 if __name__ == "__main__":
     inpath = "../img_align_celeba/"
-    outpath = "img/processed/"
+    outpath = "img/processed_128/"
     if not os.path.exists(outpath):
         os.mkdir(outpath)
     files = os.listdir(inpath)

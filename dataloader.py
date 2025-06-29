@@ -8,8 +8,8 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
 # 设置图像尺寸
-img_dim = 64
-PATH = "img/processed/"
+img_dim = 128
+PATH = "img/processed_128/"
 
 
 class DataGenerater(Dataset):

@@ -2,7 +2,7 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from network import Generator
+from network_128 import Generator
 import os
 
 # 设置设备
@@ -12,7 +12,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 generate = Generator().to(device)
 
 # 加载模型权重
-state_dict = torch.load("generator.params", map_location=device)
+state_dict = torch.load("generator_128.params", map_location=device)
 generate.load_state_dict(state_dict)
 
 # 生成噪声
@@ -29,6 +29,6 @@ for j in range(100):
     image = generated_image[j].transpose(1, 2, 0)  # 转换为 HWC 格式
     image = ((image + 1) / 2 * 255).astype(np.uint8)
     pil_image = Image.fromarray(image)
-    pil_image.save(f'Generate/generated_{j + 1}.png')
+    pil_image.save(f'Generate/128/generated_{j + 1}.png')
 
 print("Images saved using Pillow (PIL)")

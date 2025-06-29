@@ -6,15 +6,15 @@ import torchvision
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
-from network import *
+from network_128 import *
 from dataloader import *
 from tqdm import tqdm
 import multiprocessing
 
 
-img_dim = 64
+img_dim = 128
 lr = 0.0002
-epochs = 5
+epochs = 5  
 batch_size = 128
 G_DIMENSION = 100
 beta1 = 0.5
@@ -106,8 +106,8 @@ def main():
     plt.savefig('Generator_and_Discriminator_Loss_During_Training.png')
     plt.close()
 
-    torch.save(netG.state_dict(), "generator.params")
-    print("Generator model saved as generator.params")
+    torch.save(netG.state_dict(), "generator_128.params")
+    print("Generator model saved as generator_128.params")
 
 if __name__ == '__main__':
     multiprocessing.freeze_support() # 添加 freeze_support()
