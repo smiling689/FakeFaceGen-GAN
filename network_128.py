@@ -35,7 +35,6 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             # 输出: (N, 1024, 4, 4)
 
-            # --- 修改最后一层 ---
             nn.Conv2d(d_feature_map_size * 16, 1, kernel_size=4, stride=1, padding=0, bias=False),
             # 输出: (N, 1, 1, 1)
             nn.Sigmoid()
@@ -54,7 +53,7 @@ class Generator(nn.Module):
         g_feature_map_size = 64
 
         self.main = nn.Sequential(
-            # 输入: (N, 100, 1, 1) 维的噪声
+            # 输入: (N, 100, 1, 1) 
             nn.ConvTranspose2d(G_DIMENSION, g_feature_map_size * 16, kernel_size=4, stride=1, padding=0, bias=False),
             nn.BatchNorm2d(g_feature_map_size * 16),
             nn.ReLU(True),
@@ -75,13 +74,11 @@ class Generator(nn.Module):
             nn.ReLU(True),
             # 输出: (N, 128, 32, 32)
             
-            # --- 新增层 ---
             nn.ConvTranspose2d(g_feature_map_size * 2, g_feature_map_size, kernel_size=4, stride=2, padding=1, bias=False),
             nn.BatchNorm2d(g_feature_map_size),
             nn.ReLU(True),
             # 输出: (N, 64, 64, 64)
             
-            # --- 修改最后一层 ---
             nn.ConvTranspose2d(g_feature_map_size, 3, kernel_size=4, stride=2, padding=1, bias=False),
             # 输出: (N, 3, 128, 128)
             nn.Tanh()

@@ -7,8 +7,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 import os
 
-from network_128 import Generator # 从你的 network.py 导入生成器
-from dataloader import DataGenerater # 从你的 dataloader.py 导入数据加载器
+from network_128 import Generator
+from dataloader import DataGenerater
 
 # FID 计算函数
 def calculate_fid(real_features, fake_features):
@@ -29,14 +29,13 @@ def calculate_fid(real_features, fake_features):
     fid = ssdiff + np.trace(sigma_real + sigma_fake - 2.0 * covmean)
     return fid
 
-# 特征提取辅助函数 (已修正)
+# 特征提取辅助函数
 @torch.no_grad()
 def get_activations(data_loader, inception_model, device, generator_model=None):
     inception_model.eval()
     activations = []
     
     desc = ""
-    # 根据是否有生成器模型来决定是处理真实图片还是生成虚假图片
     if generator_model:
         generator_model.eval()
         desc = "Generating fake images and getting activations"
@@ -53,12 +52,9 @@ def get_activations(data_loader, inception_model, device, generator_model=None):
             # 处理真实图片
             images = data.to(device)
 
-        # InceptionV3期望输入是(N, 3, 299, 299)
         upsampled_images = nn.functional.interpolate(images, size=(299, 299), mode='bilinear', align_corners=False)
         
-        # 修正：总是使用 inception_model 来提取特征
         act = inception_model(upsampled_images)
-        # InceptionV3 在训练时返回一个元组(logits, aux_logits)，评估时只返回 logits
         if isinstance(act, tuple):
             act = act[0]
         
@@ -71,12 +67,12 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
-    # 1. 加载Inception-v3模型 (使用新的 'weights' API)
+    # 加载Inception-v3模型
     inception_model = inception_v3(weights=Inception_V3_Weights.DEFAULT, transform_input=False).to(device)
-    # 我们只需要特征，所以移除最后的分类层
+    # 移除分类层
     inception_model.fc = nn.Identity()
 
-    # 2. 加载你的训练好的生成器
+    # 加载生成器
     G = Generator().to(device)
     try:
         G.load_state_dict(torch.load("generator_128.params", map_location=device))
@@ -84,19 +80,17 @@ if __name__ == '__main__':
         print("Error: generator.params not found. Please train your model first.")
         exit()
     
-    # 3. 准备数据加载器
-    batch_size = 32 # 减小batch size以防显存不足
+    # 数据加载器
+    batch_size = 32 
     real_dataset = DataGenerater()
     real_loader = DataLoader(real_dataset, batch_size=batch_size, shuffle=True, num_workers=2, drop_last=True)
     
     # 创建一个loader来确定生成多少张假图片
-    # 它的长度与real_loader相同，但我们只用它来迭代计数
     fake_loader = DataLoader([0] * len(real_loader), batch_size=batch_size)
 
-    # 4. 提取真实图片和生成图片的特征 (使用修正后的函数调用)
     real_activations = get_activations(real_loader, inception_model, device)
     fake_activations = get_activations(fake_loader, inception_model, device, generator_model=G)
 
-    # 5. 计算并打印FID分数
+    # 计算FID
     fid_score = calculate_fid(real_activations, fake_activations)
     print(f"\nFréchet Inception Distance (FID): {fid_score:.4f}")
